@@ -29,7 +29,7 @@ usage() {
 }
 
 
-export IMAGE_NAME="bgs-dm-search-srv"
+export IMAGE_NAME="osc-dm-search-srv"
 export HOSTNAME="$IMAGE_NAME"
 
 

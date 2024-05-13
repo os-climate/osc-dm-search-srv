@@ -89,7 +89,7 @@ class SearchDb():
 
         res = []
         for result in results:
-            host = "bgs-dm-proxy-srv"
+            host = "osc-dm-proxy-srv"
             port = 8000
             _uuid = result["metadata"]["id"]
             service = f"/api/dataproduct/discovery/uuid/{_uuid}/artifacts"
