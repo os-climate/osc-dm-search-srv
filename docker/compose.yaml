@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+
+    # Data Product
+    bgs-dm-search-srv:
+        image: ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest
+        hostname: ${HOSTNAME}
+        # container_name: ${HOSTNAME}
+        ports:
+        # OUTSIDE:INSIDE
+        # curl http://localhost:${SERVER_PORT}/data
+        - ${PUBLIC_PORT}:${PRIVATE_PORT}
+        volumes:
+        - ${PROJECT_DIR}/config/${CONFIG_NAME}:/app/config
+        - ${PROJECT_DIR}/data/${CONFIG_NAME}:/app/data
+        networks:
+        - localnet
+
+networks:
+    localnet:
+        external: true

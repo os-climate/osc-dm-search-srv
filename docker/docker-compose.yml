@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+
+    bgs-dm-search-srv:
+        image: ${DOCKERHUB_USERNAME}/bgs-dm-search-srv:latest
+        hostname: bgs-dm-search-srv
+        ports:
+        # OUTSIDE:INSIDE
+        - 23000:8000
+        volumes:
+        - ${PROJECT_DIR}/config:/app/config
+        - ${PROJECT_DIR}/data:/app/data
+        environment:
+          OPENAI_API_KEY: ${OPENAI_API_KEY}
+        networks:
+        - localnet
+
+networks:
+    localnet:
+        external: true

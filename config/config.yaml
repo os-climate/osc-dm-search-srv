@@ -1,0 +1,12 @@
+server:
+    load_interval_seconds: 60
+database:
+    db_location: /app/data/test_db
+    collection_name: testcollection
+    persist: False
+registrar:
+    host: bgssrv-dmregistrar
+    port: 8000
+    service: /api/registrar/products
+    method: GET
+
