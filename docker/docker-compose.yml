@@ -1,9 +1,9 @@
 version: '3.8'
 services:
 
-    bgs-dm-search-srv:
-        image: ${DOCKERHUB_USERNAME}/bgs-dm-search-srv:latest
-        hostname: bgs-dm-search-srv
+    osc-dm-search-srv:
+        image: ${DOCKERHUB_USERNAME}/osc-dm-search-srv:latest
+        hostname: osc-dm-search-srv
         ports:
         # OUTSIDE:INSIDE
         - 23000:8000

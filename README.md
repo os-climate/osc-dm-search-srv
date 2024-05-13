@@ -1,4 +1,4 @@
-# bgs-dm-search-srv - Ecosystem Platform Search
+# osc-dm-search-srv - Ecosystem Platform Search
 
 Ecosystem Platform Search is a search service
 for Broda Group Software's Ecosystem Platform, using
