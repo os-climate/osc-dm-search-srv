@@ -31,7 +31,9 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # Constants
-ENDPOINT_PREFIX = "/api"
+ENDPOINT_SEARCH = "/search"
+ENDPOINT_PREFIX = "/api" + ENDPOINT_SEARCH
+
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 8000
 
@@ -41,11 +43,11 @@ db: SearchDb = None
 
 
 #####
-# ENDPOINTS
+# SEARCH
 #####
 
 
-@app.post(ENDPOINT_PREFIX + "/search/add")
+@app.post(ENDPOINT_PREFIX + "/add")
 async def add(
         params: AddData
 ):
@@ -63,7 +65,7 @@ async def add(
         raise HTTPException(status_code=500, detail=msg)
 
 
-@app.post(ENDPOINT_PREFIX + "/search/query")
+@app.post(ENDPOINT_PREFIX + "/query")
 async def search(
         params: QueryData
 ):
@@ -83,7 +85,7 @@ async def search(
     }
 
 
-@app.post(ENDPOINT_PREFIX + "/search/query/artifacts")
+@app.post(ENDPOINT_PREFIX + "/query/artifacts")
 async def search_artifacts(
         params: QueryData
 ):
@@ -101,6 +103,42 @@ async def search_artifacts(
     return {
         "data": res
     }
+
+
+#####
+# MONITOR
+#####
+
+
+@app.get(ENDPOINT_PREFIX + "/health")
+async def search_health_get():
+    """
+    Get health information
+    """
+    logger.info("START: Get health information")
+
+    response = {
+        "health": "OK"
+    }
+
+    logger.info(f"DONE: Get health information, response:{response}")
+    return response
+
+
+@app.get(ENDPOINT_PREFIX + "/metrics")
+async def search_metrics_get():
+    """
+    Get metrics information
+    """
+    logger.info("START: Get metrics information")
+
+    response = {
+        "metrics": "some-metrics"
+    }
+
+    logger.info(f"DONE: Get metrics information, response:{response}")
+    return response
+
 
 #####
 # INTERNAL
