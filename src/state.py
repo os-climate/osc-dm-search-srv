@@ -4,18 +4,36 @@
 # license that can be found in the LICENSE file or at
 # https://opensource.org/licenses/MIT.
 #
-# Created: 2024-05-02 by graeham.broda@gmail.com
-from typing import Any
+# Created:  2024-04-15 by eric.broda@brodagroupsoftware.com
+
 """
 Dictionary containing global state
 """
 global_state = {}
 
-def add_global(key: str, val: Any):
-    global_state[key] = val
+def gstate(name: str, value: any=None):
+    """
+    Global state manager for registration state
 
-def get_global(key: str) -> Any:
-    return global_state[key]
+    If registration is provided then global state is set to True
+    and instance is returned.
 
-def remove_global(key: str):
-    del global_state[key]
+    If registration does not exist then False will be returned.
+    Returns registration state in global state if it exists.
+
+    Args:
+        registration (any, optional, default: True): registration state to store
+
+    Returns:
+        any: database instance in global state.
+    """
+
+    global global_state
+    if value is not None:
+        global_state[name] = value
+        return value
+
+    value = None
+    if name in global_state:
+        value = global_state[name]
+    return value
