@@ -19,7 +19,8 @@ import yaml
 # Project imports
 from models import AddData, QueryData
 import utilities
-from state import add_global, remove_global, get_global
+import state
+from middleware import LoggingMiddleware
 
 # Set up logging
 LOGGING_FORMAT = \
@@ -29,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 # Set up server
 app = FastAPI()
+app.add_middleware(LoggingMiddleware)
 
 # Constants
 ENDPOINT_SEARCH = "/search"
@@ -36,6 +38,8 @@ ENDPOINT_PREFIX = "/api" + ENDPOINT_SEARCH
 
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 8000
+
+STATE_CONFIG="state-config"
 
 # Setup database instance
 from searchdb import SearchDb
@@ -152,7 +156,7 @@ async def _load(param1, param2):
     logger.info(f"Loading data param1:{param1} param2:{param2}")
 
     try:
-        conf = get_global("config")
+        conf = state.gstate(STATE_CONFIG)
         host = conf["registrar"]["host"]
         port = conf["registrar"]["port"]
         service = conf["registrar"]["service"]
@@ -183,7 +187,7 @@ async def startup_event():
     """
     At startup, immediately load data and then periodically thereafter
     """
-    conf = get_global("config")
+    conf = state.gstate(STATE_CONFIG)
     logger.info("Running startup event")
     param1 = "fake param 1"
     param2 = "fake param 2"
@@ -215,10 +219,10 @@ if __name__ == "__main__":
     # Read the configuration file
     configuration = None
     with open(args.configuration, 'r') as file:
-        add_global("config", yaml.safe_load(file))
+        state.gstate(STATE_CONFIG, yaml.safe_load(file))
 
 
-    configuration = get_global("config")
+    configuration = state.gstate(STATE_CONFIG)
     logger.info("config: {}".format(configuration))
     # Setup the database
     db = SearchDb(configuration["database"]["db_location"],
