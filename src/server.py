@@ -6,14 +6,12 @@
 #
 # Created: 2024-04-22 by graeham.broda@gmail.com
 # Library imports
-import json
 import logging
 from typing import Optional
-import configparser
+import uuid
 
 import uvicorn as uvicorn
-from fastapi import FastAPI, Request, WebSocket, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
 import yaml
 
 # Project imports
@@ -21,6 +19,7 @@ from models import AddData, QueryData
 import utilities
 import state
 from middleware import LoggingMiddleware
+import constants
 
 # Set up logging
 LOGGING_FORMAT = \
@@ -119,13 +118,9 @@ async def search_health_get():
     """
     Get health information
     """
-    logger.info("START: Get health information")
-
     response = {
         "health": "OK"
     }
-
-    logger.info(f"DONE: Get health information, response:{response}")
     return response
 
 
@@ -134,13 +129,8 @@ async def search_metrics_get():
     """
     Get metrics information
     """
-    logger.info("START: Get metrics information")
-
-    response = {
-        "metrics": "some-metrics"
-    }
-
-    logger.info(f"DONE: Get metrics information, response:{response}")
+    metrics = LoggingMiddleware.get_metrics()
+    response = metrics
     return response
 
 
@@ -161,9 +151,12 @@ async def _load(param1, param2):
         port = conf["registrar"]["port"]
         service = conf["registrar"]["service"]
         method = conf["registrar"]["method"]
-        response = await utilities.httprequest(host, port, service, method)
-
-        # response = await utilities.httprequest(host, port, service, method)
+        headers = {
+            constants.HEADER_USERNAME: constants.USERNAME,
+            constants.HEADER_CORRELATION_ID: str(uuid.uuid4())
+        }
+        logger.info(f"Issuing request using header:{headers}")
+        response = await utilities.httprequest(host, port, service, method, headers=headers)
 
         for element in response:
             logger.info("adding element: {}".format((element["uuid"], element["name"], element["description"])))
@@ -213,14 +206,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logger.info(f"Using current working directory:{os.getcwd()}")
-    logger.info(f"arg config: {args.configuration}")
-    logger.info(f"dir contents: {os.listdir('./config')}")
+    logger.info(f"Using configuration: {args.configuration}")
+    logger.info(f"Directory contents: {os.listdir('./config')}")
 
     # Read the configuration file
     configuration = None
     with open(args.configuration, 'r') as file:
         state.gstate(STATE_CONFIG, yaml.safe_load(file))
-
 
     configuration = state.gstate(STATE_CONFIG)
     logger.info("config: {}".format(configuration))
@@ -230,13 +222,11 @@ if __name__ == "__main__":
                   bool(configuration["database"]["persist"]),
                   configuration["registrar"])
 
-
-
     # Start the server
     try:
-        logger.info(f"START: service on host:{args.host} port:{args.port}")
+        logger.info(f"Starting service on host:{args.host} port:{args.port}")
         uvicorn.run(app, host=args.host, port=args.port)
     except Exception as e:
         logger.info(f"Stopping server, exception:{e}")
     finally:
-        logger.info(f"DONE: Starting service on host:{args.host} port:{args.port}")
+        logger.info(f"Terminating service")
