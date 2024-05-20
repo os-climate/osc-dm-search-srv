@@ -8,9 +8,9 @@
 import chromadb
 import chromadb.utils.embedding_functions as embedding_functions
 import utilities
-from bgsexception import BgsException
+import constants
+# from bgsexception import BgsException
 # from state import get_global
-from models import Artifact
 
 import os
 import uuid
@@ -96,7 +96,12 @@ class SearchDb():
             logger.info(f"service being called: {service}")
             method = "GET"
 
-            response = await utilities.httprequest(host, port, service, method)
+            headers = {
+                constants.HEADER_USERNAME: constants.USERNAME,
+                constants.HEADER_CORRELATION_ID: str(uuid.uuid4())
+            }
+            response = await utilities.httprequest(
+                host, port, service, method, headers=headers)
             formatted = []
             for element in response:
                 logger.info(f"artifact: {element}")
